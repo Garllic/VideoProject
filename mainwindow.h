@@ -17,10 +17,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 private slots:
+    //播放按钮点击
     void on_BTN_Play_clicked();
-
+    //停止按钮点击
     void on_BTN_Pause_clicked();
-
+    //音量滑动条改变
     void on_VS_Volume_valueChanged(int value);
 
 private:
