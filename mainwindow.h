@@ -16,6 +16,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+private slots:
+    void on_BTN_Play_clicked();
+
+    void on_BTN_Pause_clicked();
+
+    void on_VS_Volume_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;
