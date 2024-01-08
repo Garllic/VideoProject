@@ -1,7 +1,11 @@
 QT       += core gui
+
+DEPENDPATH += $$PWD/include
+LIBS += $$PWD/lib/libvlc.lib
+LIBS += $$PWD/lib/libvlccore.lib
 INCLUDEPATH += $$PWD/include
-LIBS += $$PWD/lib/libvlc.lib\
-        $$PWD/lib/libvlccore.lib
+
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,10 +16,12 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    evlc.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    evlc.h \
     mainwindow.h
 
 FORMS += \
@@ -33,3 +39,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     icons.qrc
+
+
