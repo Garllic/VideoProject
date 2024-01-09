@@ -18,11 +18,13 @@ CONFIG += c++17
 SOURCES += \
     evlc.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    videoclientcontroller.cpp
 
 HEADERS += \
     evlc.h \
-    mainwindow.h
+    mainwindow.h \
+    videoclientcontroller.h
 
 FORMS += \
     mainwindow.ui

@@ -1,8 +1,8 @@
-#include "mainwindow.h"
-
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
+
+#include "videoclientcontroller.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,13 +11,18 @@ int main(int argc, char *argv[])
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for (const QString &locale : uiLanguages) {
-        const QString baseName = "VideoClient_" + QLocale(locale).name();
+        const QString baseName = "weather_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
             a.installTranslator(&translator);
             break;
         }
     }
-    MainWindow w;
-    w.show();
+
+    VideoClientController* controller = VideoClientController::GetInstance();
+    if(controller->Init() != 0){
+        return -1;
+    }
+    controller->Invoke();
+
     return a.exec();
 }

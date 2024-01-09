@@ -4,6 +4,7 @@
 #include <vlc/vlc.h>
 #include <string>
 #include <QWidget>
+#include <windows.h>
 
 //设计数据结构保存MediaInfo
 typedef struct {
@@ -15,13 +16,13 @@ typedef struct {
 //对vlc做一些简单的封装
 class EVlc
 {
+public:
+    bool reset;
 protected:
     libvlc_instance_t* m_instance;
     libvlc_media_t* m_media;
     libvlc_media_player_t* m_player;
 public:
-    //获取单例
-    static EVlc* GetInstance();
     //初始化m_media，m_player
     int SetMedia(const std::string& strUrl);
     //视频播放
@@ -42,14 +43,12 @@ public:
     int SetVolume(int volume);
     //获取播放信息
     VSize GetMediaInfo();
-private:
+
     EVlc& operator=(const EVlc& s);
     EVlc();
     EVlc(const EVlc& s);
     ~EVlc();
-    static EVlc* instance;    //单例模式
 };
 
-EVlc* EVlc::instance = new EVlc;    //实例化单例
 
 #endif // EVLC_H

@@ -1,10 +1,5 @@
 #include "evlc.h"
 
-EVlc* EVlc::GetInstance()
-{
-    return instance;
-}
-
 int EVlc::SetMedia(const std::string &strUrl)
 {
     if(m_instance == NULL) return -1;
@@ -25,7 +20,8 @@ int EVlc::Play()
 
 int EVlc::SetWidget(QWidget *widget)
 {
-    libvlc_media_player_set_hwnd(m_player, (void*)widget->winId());
+    if(m_instance == NULL || m_media == NULL || m_player==NULL) return -1;
+    libvlc_media_player_set_hwnd(m_player, (HWND)widget->winId());
 
     return 0;
 }
@@ -91,6 +87,7 @@ EVlc &EVlc::operator=(const EVlc &s)
         m_instance = s.m_instance;
         m_media = s.m_media;
         m_player = s.m_player;
+        reset = s.reset;
     }
 
     return *this;
@@ -98,6 +95,7 @@ EVlc &EVlc::operator=(const EVlc &s)
 
 EVlc::EVlc()
 {
+    reset = true;
     m_instance = libvlc_new(0, NULL);
     m_media = NULL;
     m_player = NULL;
@@ -109,6 +107,7 @@ EVlc::EVlc(const EVlc &s)
         m_instance = s.m_instance;
         m_media = s.m_media;
         m_player = s.m_player;
+        reset = s.reset;
     }
 }
 
@@ -120,7 +119,8 @@ EVlc::~EVlc()
     if(m_media!=NULL){
         libvlc_media_release(m_media);
     }
-    if(instance!=NULL){
+    if(m_instance!=NULL){
         libvlc_release(m_instance);
     }
 }
+
