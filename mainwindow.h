@@ -20,6 +20,7 @@ protected:
 public:
     MainWindow(QWidget *parent = nullptr);
     Ui::MainWindow* GetUi();
+    void SetDuration(float t);
     ~MainWindow();
 private slots:
     //播放按钮点击
@@ -28,6 +29,8 @@ private slots:
     void on_BTN_Stop_clicked();
     //音量滑动条改变
     void on_VS_Volume_valueChanged(int value);
+    //退出
+    void on_BTN_Exit_clicked();
 
 private:
     Ui::MainWindow *ui;

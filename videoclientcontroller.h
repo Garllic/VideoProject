@@ -9,16 +9,18 @@ enum EVlcCommond{
     EVLC_PAUSE,         //暂停
     EVLC_STOP,          //停止
     EVLC_GET_VOLUME,    //获取音量
-    EVLC_GET_POSITION   //获取进度
+    EVLC_GET_POSITION,   //获取进度
+    EVLC_GET_DURATION   //获取时长
 };
 
 class VideoClientController
 {
 public:
-    Ui::MainWindow* m_ui;         //视图层
-    EVlc* m_evlc;               //模型层
+    MainWindow* m_mainwindow;       //视图层
+    EVlc* m_evlc;                   //模型层
+    bool m_isPlaying;               //视频是否正在播放
 private:
-    MainWindow* m_mainwindow;
+
 public:
     //获取实例
     static VideoClientController* GetInstance();
@@ -38,6 +40,7 @@ public:
     void SetVolume(int volume);
     //获取Mediainfo
     VSize GetMediaInfo();
+
 private:
     //单例模型
     VideoClientController();
@@ -45,6 +48,12 @@ private:
     VideoClientController(const VideoClientController& s);
     VideoClientController& operator=(const VideoClientController& s);
     static VideoClientController* instance;
+    class GC{
+    public:
+        GC(){};
+        ~GC();
+    };
+    static GC releaseInstance;
 };
 
 #endif // VIDEOCLIENTCONTROLLER_H

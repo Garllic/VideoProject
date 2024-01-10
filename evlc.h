@@ -10,18 +10,17 @@
 typedef struct {
     int nWidth;     //播放窗口宽
     int nHeight;    //播放窗口高
-    long long tm;   //视频时长
 }VSize;
 
 //对vlc做一些简单的封装
 class EVlc
 {
-public:
-    bool reset;
 protected:
     libvlc_instance_t* m_instance;
     libvlc_media_t* m_media;
     libvlc_media_player_t* m_player;
+    std::string m_url;                  //当前视频地址
+    QWidget* m_playerWidget;            //当前播放Widget
 public:
     //初始化m_media，m_player
     int SetMedia(const std::string& strUrl);
@@ -43,6 +42,8 @@ public:
     int SetVolume(int volume);
     //获取播放信息
     VSize GetMediaInfo();
+    //获取视频时长
+    libvlc_time_t GetDuration();
 
     EVlc& operator=(const EVlc& s);
     EVlc();

@@ -1,8 +1,7 @@
-#include <ui_mainwindow.h>
-
 #include "videoclientcontroller.h"
 
 VideoClientController* VideoClientController::instance = new VideoClientController();   //实例化单例
+VideoClientController::GC VideoClientController::releaseInstance;
 
 VideoClientController *VideoClientController::GetInstance()
 {
@@ -13,8 +12,7 @@ int VideoClientController::Init()
 {
     //mainwindow初始化
     m_mainwindow = new MainWindow();
-    m_ui = m_mainwindow->GetUi();
-    //evlc单例初始化
+    //evlc初始化
     m_evlc = new EVlc();
 
     return 0;
@@ -38,21 +36,34 @@ float VideoClientController::VideoCtrl(EVlcCommond cmd)
 {
     switch (cmd) {
     case EVLC_PLAY:
+        //视频播放
         m_evlc->Play();
+        m_isPlaying = true;
         break;
     case EVLC_PAUSE:
+        //视频暂停
         m_evlc->Pause();
+        m_isPlaying = false;
         break;
     case EVLC_STOP:
+        //视频停止
         m_evlc->Stop();
+        m_isPlaying = false;
         break;
     case EVLC_GET_POSITION:
+        //获取视频进度
         return m_evlc->GetPosition();
         break;
     case EVLC_GET_VOLUME:
+        //获取视频音量
         return m_evlc->GetVolume();
         break;
+    case EVLC_GET_DURATION:
+        //获取时长
+        return m_evlc->GetDuration();
+        break;
     default:
+        return -1;
         break;
     }
 
@@ -92,6 +103,7 @@ VideoClientController::VideoClientController()
 {
     m_evlc = NULL;
     m_mainwindow = NULL;
+    m_isPlaying = false;
 }
 
 VideoClientController::~VideoClientController()
@@ -105,6 +117,7 @@ VideoClientController::VideoClientController(const VideoClientController &s)
     if(&s != this){
         m_mainwindow = s.m_mainwindow;
         m_evlc = s.m_evlc;
+        m_isPlaying = s.m_isPlaying;
     }
 }
 
@@ -113,7 +126,18 @@ VideoClientController &VideoClientController::operator=(const VideoClientControl
     if(&s != this){
         m_mainwindow = s.m_mainwindow;
         m_evlc = s.m_evlc;
+        m_isPlaying = s.m_isPlaying;
     }
 
     return *this;
 }
+
+VideoClientController::GC::~GC()
+{
+    if(VideoClientController::instance==NULL){
+        return ;
+    }
+    delete VideoClientController::instance;
+    VideoClientController::instance = NULL;
+}
+
