@@ -3,13 +3,10 @@
 int EVlc::SetMedia(const std::string &strUrl)
 {
     if(m_instance == NULL) return -1;
-    if(m_url == strUrl)return 1;
 
     if(m_media!=NULL){
         libvlc_media_release(m_media);
         m_media=NULL;
-        m_url = "";
-        m_playerWidget = NULL;
     }
     m_media = libvlc_media_new_location(m_instance, strUrl.c_str());
     if(!m_media) return -2;
@@ -20,7 +17,6 @@ int EVlc::SetMedia(const std::string &strUrl)
     }
     m_player = libvlc_media_player_new_from_media(m_media);
     if(!m_player) return -3;
-    m_url = strUrl;
 
     return 0;
 }
@@ -35,9 +31,7 @@ int EVlc::Play()
 int EVlc::SetWidget(QWidget *widget)
 {
     if(m_instance == NULL || m_media == NULL || m_player==NULL) return -1;
-    if(m_playerWidget == widget) return 0;
     libvlc_media_player_set_hwnd(m_player, (HWND)widget->winId());
-    m_playerWidget = widget;
 
     return 0;
 }
@@ -54,8 +48,6 @@ int EVlc::Stop()
 {
     if(m_instance == NULL || m_media == NULL || m_player==NULL) return -1;
     libvlc_media_player_stop(m_player);
-    m_url = "";
-    m_playerWidget = NULL;
 
     return 0;
 }
@@ -114,8 +106,6 @@ EVlc &EVlc::operator=(const EVlc &s)
         m_instance = s.m_instance;
         m_media = s.m_media;
         m_player = s.m_player;
-        m_playerWidget = s.m_playerWidget;
-        m_url = s.m_url;
     }
 
     return *this;
@@ -126,8 +116,6 @@ EVlc::EVlc()
     m_instance = libvlc_new(0, NULL);
     m_media = NULL;
     m_player = NULL;
-    m_playerWidget = NULL;
-    m_url = "";
 }
 
 EVlc::EVlc(const EVlc &s)
@@ -136,8 +124,6 @@ EVlc::EVlc(const EVlc &s)
         m_instance = s.m_instance;
         m_media = s.m_media;
         m_player = s.m_player;
-        m_playerWidget = s.m_playerWidget;
-        m_url = s.m_url;
     }
 }
 

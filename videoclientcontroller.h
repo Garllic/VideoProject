@@ -19,7 +19,8 @@ public:
     MainWindow* m_mainwindow;       //视图层
     EVlc* m_evlc;                   //模型层
     bool m_isPlaying;               //视频是否正在播放
-private:
+    long long m_duration;           //视频时长
+    std::string m_url;
 
 public:
     //获取实例
@@ -40,6 +41,8 @@ public:
     void SetVolume(int volume);
     //获取Mediainfo
     VSize GetMediaInfo();
+    //视频停止后重置状态
+    void Reset();
 
 private:
     //单例模型

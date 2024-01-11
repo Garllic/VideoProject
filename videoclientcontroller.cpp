@@ -28,6 +28,7 @@ int VideoClientController::Invoke()
 int VideoClientController::SetMedia(std::string strUrl)
 {
     m_evlc->SetMedia(strUrl);
+    m_url = strUrl;
 
     return 0;
 }
@@ -39,6 +40,9 @@ float VideoClientController::VideoCtrl(EVlcCommond cmd)
         //视频播放
         m_evlc->Play();
         m_isPlaying = true;
+        m_mainwindow->TimerStart();
+        Sleep(100);
+        m_duration = m_evlc->GetDuration();
         break;
     case EVLC_PAUSE:
         //视频暂停
@@ -48,7 +52,7 @@ float VideoClientController::VideoCtrl(EVlcCommond cmd)
     case EVLC_STOP:
         //视频停止
         m_evlc->Stop();
-        m_isPlaying = false;
+        Reset();
         break;
     case EVLC_GET_POSITION:
         //获取视频进度
@@ -60,7 +64,7 @@ float VideoClientController::VideoCtrl(EVlcCommond cmd)
         break;
     case EVLC_GET_DURATION:
         //获取时长
-        return m_evlc->GetDuration();
+        return m_duration;
         break;
     default:
         return -1;
@@ -99,11 +103,22 @@ VSize VideoClientController::GetMediaInfo()
     return m_evlc->GetMediaInfo();
 }
 
+void VideoClientController::Reset()
+{
+    m_isPlaying = false;
+    m_mainwindow->TimerStop();
+    m_duration = 0;
+    m_url = "";
+    m_mainwindow->ResetPosition();
+}
+
 VideoClientController::VideoClientController()
 {
     m_evlc = NULL;
     m_mainwindow = NULL;
     m_isPlaying = false;
+    m_duration = 0;
+    m_url = "";
 }
 
 VideoClientController::~VideoClientController()
@@ -118,6 +133,8 @@ VideoClientController::VideoClientController(const VideoClientController &s)
         m_mainwindow = s.m_mainwindow;
         m_evlc = s.m_evlc;
         m_isPlaying = s.m_isPlaying;
+        m_duration = s.m_duration;
+        m_url = s.m_url;
     }
 }
 
@@ -127,6 +144,8 @@ VideoClientController &VideoClientController::operator=(const VideoClientControl
         m_mainwindow = s.m_mainwindow;
         m_evlc = s.m_evlc;
         m_isPlaying = s.m_isPlaying;
+        m_duration = s.m_duration;
+        m_url = s.m_url;
     }
 
     return *this;

@@ -19,8 +19,7 @@ protected:
     libvlc_instance_t* m_instance;
     libvlc_media_t* m_media;
     libvlc_media_player_t* m_player;
-    std::string m_url;                  //当前视频地址
-    QWidget* m_playerWidget;            //当前播放Widget
+
 public:
     //初始化m_media，m_player
     int SetMedia(const std::string& strUrl);
