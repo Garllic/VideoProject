@@ -2,7 +2,7 @@
 #include "Socket.h"
 #include <string>
 #include <map>
-#include "CThread.h"
+#include "CThreadPool.h"
 
 class RTSPRequest 
 {
@@ -45,7 +45,6 @@ private:
 	static SocketIniter m_initer;
 	Socket m_socket;
 	int m_status;//0 未初始化  1 初始化完成  2 正在运行  3 关闭
-	CThread m_threadMain;
 	CThreadPool m_threadPool;
 	std::map<std::string, RTSPSession> m_mapSession;
 };
