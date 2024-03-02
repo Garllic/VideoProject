@@ -9,8 +9,8 @@ int main()
     RTSPServer server;
     server.Init();
     server.Invoke();
+    std::cout << "press any key to stop..." << std::endl;
     getchar();
-    server.Stop();
 
     return 0;
 }
