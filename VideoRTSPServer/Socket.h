@@ -2,7 +2,7 @@
 #include <WinSock2.h>
 #include <mutex>
 #include <iostream>
-#include <atltrace.h>
+#include "Base.h"
 #include "CBuffer.h"
 #pragma comment(lib, "ws2_32.lib")
 

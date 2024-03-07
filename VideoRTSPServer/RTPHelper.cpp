@@ -1,7 +1,4 @@
 #include "RTPHelper.h"
-#include <Windows.h>
-
-#define MAX_DATA 1300
 
 RTPHelper::RTPHelper():m_timeStamp(0)
 {

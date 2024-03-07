@@ -1,5 +1,6 @@
 #pragma once
 #include "CBuffer.h"
+#include "Base.h"
 
 class MediaFile
 {

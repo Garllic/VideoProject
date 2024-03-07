@@ -1,5 +1,4 @@
 #include "MediaFile.h"
-#include <atltrace.h>
 
 MediaFile::MediaFile()
 {

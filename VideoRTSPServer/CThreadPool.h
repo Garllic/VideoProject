@@ -2,7 +2,7 @@
 #include <thread>
 #include <mutex>
 #include "ShareQueue.h"
-#include <atltrace.h>
+#include "Base.h"
 
 using callback = void (*)(void* arg);
 

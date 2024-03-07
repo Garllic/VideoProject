@@ -3,9 +3,10 @@
 #include <string>
 #include <map>
 #include "CThreadPool.h"
-#include <atltrace.h> 
 #include "RTPHelper.h"
 #include "MediaFile.h"
+#include "Base.h"
+
 
 class RTSPRequest 
 {

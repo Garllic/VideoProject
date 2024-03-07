@@ -104,7 +104,7 @@ RTSPSession::RTSPSession()
     m_id.resize(10);
     snprintf((char*)m_id.c_str(), m_id.size(), "%u%u", uuid.Data1, uuid.Data2);
     m_mediafile = new MediaFile();
-    m_mediafile->Open("test.h264", 96);
+    m_mediafile->Open(MediaPath, 96);
 }
 
 RTSPSession::RTSPSession(const Socket& client)
@@ -116,7 +116,7 @@ RTSPSession::RTSPSession(const Socket& client)
     m_id.resize(10);
     snprintf((char*)m_id.c_str(), m_id.size(), "%u%u", uuid.Data1, uuid.Data2);
     m_mediafile = new MediaFile();
-    m_mediafile->Open("test.h264", 96);
+    m_mediafile->Open(MediaPath, 96);
 }
 
 RTSPSession::RTSPSession(const RTSPSession& ss)

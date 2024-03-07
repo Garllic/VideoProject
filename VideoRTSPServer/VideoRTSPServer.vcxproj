@@ -133,6 +133,7 @@
     <ClCompile Include="VideoRTSPServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Base.h" />
     <ClInclude Include="CBuffer.h" />
     <ClInclude Include="CThreadPool.h" />
     <ClInclude Include="MediaFile.h" />
