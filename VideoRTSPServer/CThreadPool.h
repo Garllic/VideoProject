@@ -51,7 +51,9 @@ private:
 				task = m_pool->m_taskQ->GetFront();	//取出任务队列中的任务
 				lock.unlock();
 				if (task.func != nullptr) {
+					ATLTRACE("线程%d开始工作\r\n", m_id);
 					task.func(task.args);
+					ATLTRACE("线程%d结束工作\r\n", m_id);
 				}
 			}
 			std::cout <<m_id<< " exit" << std::endl;
@@ -73,7 +75,7 @@ public:
 		}
 		return *this;
 	}
-	CThreadPool(const int n_threads = 4) :m_threads(std::vector<std::thread*>(n_threads)), m_shutdown(false)
+	CThreadPool(const int n_threads = 8) :m_threads(std::vector<std::thread*>(n_threads)), m_shutdown(false)
 	{
 		ATLTRACE("create pool\r\n");
 		m_taskQ = new ShareQueue<Task>();

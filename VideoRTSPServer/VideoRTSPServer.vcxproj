@@ -127,11 +127,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MediaFile.cpp" />
+    <ClCompile Include="RTPHelper.cpp" />
     <ClCompile Include="RTSPServer.cpp" />
     <ClCompile Include="VideoRTSPServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CBuffer.h" />
     <ClInclude Include="CThreadPool.h" />
+    <ClInclude Include="MediaFile.h" />
+    <ClInclude Include="RTPHelper.h" />
     <ClInclude Include="RTSPServer.h" />
     <ClInclude Include="ShareQueue.h" />
     <ClInclude Include="Socket.h" />

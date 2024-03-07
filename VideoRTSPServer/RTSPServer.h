@@ -4,6 +4,8 @@
 #include <map>
 #include "CThreadPool.h"
 #include <atltrace.h> 
+#include "RTPHelper.h"
+#include "MediaFile.h"
 
 class RTSPRequest 
 {
@@ -49,22 +51,36 @@ private:
 	int m_server_port[2];
 };
 
+class RTSPServer;
+
 class RTSPSession 
 {
 public:
 	std::string m_id;
 	Socket m_client;
+	unsigned short m_client_udp_port;
+	MediaFile* m_mediafile;
 public:
 	RTSPSession();
 	RTSPSession(const Socket& client);
 	RTSPSession(const RTSPSession& ss);
-	int PickRequestAndReply();		//接受客户端数据，解析并回复
+	int PickRequestAndReply(RTSPServer* server, void (*playCallback)(void* arg));		//接受客户端数据，解析并回复
+	void SessionClose() {
+		m_mediafile->Close();
+		delete m_mediafile;
+	}
 	~RTSPSession() {}
 private:
 	CBuffer PickOneLine(CBuffer& buf);
 	CBuffer Pick();										//接受客户端数据
 	RTSPRequest AnalyseRequest(const CBuffer& buffer);	//解析接受到的数据
 	RTSPReply MakeReply(const RTSPRequest& req);		//得到回复客户端的数据
+};
+
+struct PlayCallBackArg
+{
+	RTSPServer* server;
+	RTSPSession* session;
 };
 
 class RTSPServer
@@ -74,6 +90,8 @@ public:
 	int Init(const std::string& strIP = "0.0.0.0", short port= 554);
 	int Invoke();
 	void Stop();
+	CThreadPool& ThreadPool() { return m_threadPool; }
+	static void PlayCallBack(void* arg);		//play指令回调函数
 	~RTSPServer();
 protected:
 	void ThreadMain();							//主线程函数，接受客户端的连接请求
@@ -86,5 +104,6 @@ private:
 	CThreadPool m_threadPool;
 	sockaddr_in m_addr;//服务器地址
 	ShareQueue<RTSPSession> m_listSession;
+	RTPHelper m_rtphelper;
 };
 

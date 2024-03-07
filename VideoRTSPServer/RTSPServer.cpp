@@ -16,7 +16,7 @@ int RTSPServer::Init(const std::string& strIP, short port)
     m_addr.sin_family = AF_INET;
     m_addr.sin_port = htons(port);
     m_addr.sin_addr.s_addr = inet_addr(strIP.c_str());
-    int ret = m_socket.Bind(m_addr);
+    int ret = m_socket.Bind(&m_addr);
     ret = m_socket.Listen(5);
     return 0;
 }
@@ -64,17 +64,37 @@ void RTSPServer::ThreadSession(void* arg)
 {
     int ret = 0;
     RTSPServer* s = (RTSPServer*)arg;
-    while (ret == 0) {
-        RTSPSession session;
-        //取出一个会话进行信息交互，这么做每个线程每次负责的会话不是都一样
-        if (s->m_listSession.Size() == 0) {
-            break;
-        }
-        session = s->m_listSession.GetFront();
-        if (session.m_client != INVALID_SOCKET) {
-            ret = session.PickRequestAndReply();
-        }
+
+    RTSPSession session;
+    //取出一个会话进行信息交互
+    if (s->m_listSession.Size() == 0) {
+        return;
     }
+    session = s->m_listSession.GetFront();
+    if (session.m_client != INVALID_SOCKET) {
+        ret = session.PickRequestAndReply(s, PlayCallBack);
+    }
+    session.SessionClose();
+}
+
+void RTSPServer::PlayCallBack(void* arg)
+{
+    PlayCallBackArg* a = (PlayCallBackArg*)arg;
+    RTSPServer* server = a->server;
+    RTSPSession* session = a->session;
+    RTPFrame rtpframe;
+    CBuffer frameData = session->m_mediafile->ReadOneFrame();
+    while (frameData.size() > 0) {
+        //获取udp的addr
+        sockaddr clientAddr;
+        int clientAddrLen = sizeof(clientAddr);
+        getsockname(session->m_client, &clientAddr, &clientAddrLen);
+        ((sockaddr_in*)(&clientAddr))->sin_port = htons(session->m_client_udp_port);
+        //发送udp数据
+        server->m_rtphelper.SendMediaFrame(rtpframe, frameData, clientAddr);
+        frameData = session->m_mediafile->ReadOneFrame();
+    }
+    session->m_mediafile->Reset();
 }
 
 RTSPSession::RTSPSession() 
@@ -83,6 +103,8 @@ RTSPSession::RTSPSession()
     UuidCreate(&uuid);
     m_id.resize(10);
     snprintf((char*)m_id.c_str(), m_id.size(), "%u%u", uuid.Data1, uuid.Data2);
+    m_mediafile = new MediaFile();
+    m_mediafile->Open("test.h264", 96);
 }
 
 RTSPSession::RTSPSession(const Socket& client)
@@ -93,15 +115,19 @@ RTSPSession::RTSPSession(const Socket& client)
     UuidCreate(&uuid);
     m_id.resize(10);
     snprintf((char*)m_id.c_str(), m_id.size(), "%u%u", uuid.Data1, uuid.Data2);
+    m_mediafile = new MediaFile();
+    m_mediafile->Open("test.h264", 96);
 }
 
 RTSPSession::RTSPSession(const RTSPSession& ss)
 {
     m_client = ss.m_client;
     m_id = ss.m_id;
+    m_client_udp_port = ss.m_client_udp_port;
+    m_mediafile = ss.m_mediafile;
 }
 
-int RTSPSession::PickRequestAndReply()
+int RTSPSession::PickRequestAndReply(RTSPServer* server, void (*playCallback)(void* arg))
 {
     int ret = -1;
     do{
@@ -114,7 +140,21 @@ int RTSPSession::PickRequestAndReply()
             return -2;
         }
         RTSPReply rep = MakeReply(req);             //回复客户端的数据
+        if (req.m_method == 2) {
+            m_client_udp_port = (unsigned short)atoi(req.m_client_port[0].c_str());
+        }
+        if (req.m_method == 3) {
+            //当指令值Play时开个线程发送视频流
+            struct PlayCallBackArg* arg = new struct PlayCallBackArg;
+            arg->server = server;
+            arg->session = this;
+            server->ThreadPool().SubmitTask(Task(&RTSPServer::PlayCallBack, (void*)arg));
+        }
         ret = m_client.Send(rep.toBuffer());    //回复客户端
+        if (req.m_method == 4) {
+            //视频发送完成，关闭连接
+            break;
+        }
     } while (ret > 0);
     if (ret < 0) {
         return ret;
@@ -158,7 +198,7 @@ CBuffer RTSPSession::Pick()
             }
         }
     }
-    ATLTRACE("接受数据:\r\n%s\r\n", result.c_str());
+    //ATLTRACE("接受数据:\r\n%s\r\n", result.c_str());
     return result;
 }
 
@@ -242,6 +282,7 @@ RTSPReply RTSPSession::MakeReply(const RTSPRequest& req)
         sdp << "v=0\r\n";
         sdp << "o=- " << m_id.c_str() << " 1 IN IP4 127.0.0.1\r\n";
         sdp << "t=0 0\r\n" << "a=control:*\r\n" << "m=video 0 RTP/AVP 96\r\n";
+        sdp << "a=framerate:24\r\n";
         sdp << "a=rtpmap:96 H264/90000\r\n" << "a=control:track0\r\n";
         rep.SetSdp(sdp);
     }

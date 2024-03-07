@@ -3,65 +3,8 @@
 #include <mutex>
 #include <iostream>
 #include <atltrace.h>
+#include "CBuffer.h"
 #pragma comment(lib, "ws2_32.lib")
-
-/*
-封装一个Buffer,用于接受发送数据
-*/
-class CBuffer:public std::string
-{
-public:
-	//char*:字符串
-	CBuffer(const char* str) {
-		resize(strlen(str));
-		memcpy((void*)c_str(), str, size());
-	}
-	//s:cbuffer的大小
-	CBuffer(size_t s = 0)  {
-		if (s > 0) {
-			resize(s);
-			memset((void*)c_str(), 0, s);
-		}
-	}
-	CBuffer(void* buffer, size_t s) {
-		resize(s);
-		memcpy((void*)c_str(), buffer, s);
-	}
-	~CBuffer() {}
-	void Update(void* buffer, size_t s) {
-		resize(s);
-		memcpy((void*)c_str(), buffer, s);
-	}
-	//将buffer数据置0，不改变长度
-	void SetZero() {
-		if (size() > 0) {
-			memset((void*)c_str(), 0, size());
-		}
-	}
-	CBuffer& operator<<(const char* str) {
-		if (str == this->c_str()) {
-			CBuffer t = str;
-			*this += t;
-		}
-		else {
-			*this += CBuffer(str);
-		}
-
-		return *this;
-	}
-	CBuffer& operator<<(const std::string& str) {
-		if (str == this->c_str()) {
-			CBuffer t = str.c_str();
-			*this += t;
-		}
-		else {
-			*this += str;
-		}
-
-		return *this;
-	}
-};
-
 
 /*
 封装一个Socket，当sock引用减为0时自动closesocket
@@ -127,18 +70,18 @@ public:
 			deleteflag = true;
 		}
 		else {
-			ATLTRACE("reduce socket: %d, now count=%d\r\n", m_sock, *m_pCount);
+			//ATLTRACE("reduce socket: %d, now count=%d\r\n", m_sock, *m_pCount);
 		}
 		m_pMutex->unlock();
 		if (deleteflag) {
 			delete m_pMutex;
 		}
 	}
-	int Bind(const sockaddr_in& addr) {
+	int Bind(const sockaddr_in* addr) {
 		if (m_sock == INVALID_SOCKET) {
 			return -1;
 		}
-		int ret = bind(m_sock, (sockaddr*)&addr, sizeof(sockaddr));
+		int ret = bind(m_sock, (sockaddr*)addr, sizeof(sockaddr));
 		if (ret < 0) {
 			std::cerr << "Bind failed with error: " << WSAGetLastError() << std::endl;
 		}
@@ -186,7 +129,7 @@ private:
 	void AddCount() {
 		m_pMutex->lock();
 		++(*m_pCount);
-		ATLTRACE("add socket: %d, now count=%d\r\n", m_sock, *m_pCount);
+		//ATLTRACE("add socket: %d, now count=%d\r\n", m_sock, *m_pCount);
 		m_pMutex->unlock();
 	}
 private:
