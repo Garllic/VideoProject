@@ -83,6 +83,7 @@ void RTSPServer::PlayCallBack(void* arg)
     RTSPServer* server = a->server;
     RTSPSession* session = a->session;
     RTPFrame rtpframe;
+    session->m_mediafile->Reset();
     CBuffer frameData = session->m_mediafile->ReadOneFrame();
     while (frameData.size() > 0) {
         //获取udp的addr
@@ -94,7 +95,6 @@ void RTSPServer::PlayCallBack(void* arg)
         server->m_rtphelper.SendMediaFrame(rtpframe, frameData, clientAddr);
         frameData = session->m_mediafile->ReadOneFrame();
     }
-    session->m_mediafile->Reset();
 }
 
 RTSPSession::RTSPSession() 
@@ -198,7 +198,7 @@ CBuffer RTSPSession::Pick()
             }
         }
     }
-    //ATLTRACE("接受数据:\r\n%s\r\n", result.c_str());
+   //ATLTRACE("接受数据:\r\n%s\r\n", result.c_str());
     return result;
 }
 
